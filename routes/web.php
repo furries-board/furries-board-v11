@@ -22,3 +22,13 @@ Route::middleware([
         return Inertia::render('Dashboard');
     })->name('dashboard');
 });
+
+/*
+ | ------------------------ 
+ |        Frontend
+ | ------------------------
+ */
+
+Route::group(['as' => 'frontend.'], function () {
+    includeRouteFiles(__DIR__ . '/frontend/');
+});
