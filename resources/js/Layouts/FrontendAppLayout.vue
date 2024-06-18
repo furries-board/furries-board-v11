@@ -16,6 +16,11 @@ defineProps({
     
         <Navbar></Navbar>
 
+        <!-- Page Content -->
+        <div class="p-12">
+            <slot /> 
+        </div>
+
     </div>
 
 </template>
