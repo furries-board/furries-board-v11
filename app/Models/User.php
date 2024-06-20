@@ -11,6 +11,7 @@ use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use App\Models\Board;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class User extends Authenticatable
 {
@@ -68,6 +69,6 @@ class User extends Authenticatable
 
     public function board(): HasOne
     {
-        return $this->hasOne(Board::class);
+        return $this->hasOne(Board::class, 'user_id', 'id');
     }
 }

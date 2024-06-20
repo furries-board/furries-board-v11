@@ -19,11 +19,12 @@ return new class extends Migration
                 )
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
-            $table->string('birthday');
-            $table->string('age');
-            $table->string('gender');
-            $table->string('interest');
-            $table->string('description');
+            $table->string('active')->default('1');
+            $table->string('birthday')->nullable();
+            $table->string('age')->nullable();
+            $table->string('gender')->nullable();
+            $table->string('interest')->nullable();
+            $table->string('description')->nullable();
             $table->timestamps();
         });
     }

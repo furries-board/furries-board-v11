@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue';
-import { Link, router, useForm } from '@inertiajs/vue3';
+import { Link, router, useForm, usePage } from '@inertiajs/vue3';
 import ActionMessage from '@/Components/ActionMessage.vue';
 import FormSection from '@/Components/FormSection.vue';
 import InputError from '@/Components/InputError.vue';
@@ -8,77 +8,54 @@ import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
+import Checkbox from '@/Components/Checkbox.vue';
+import TextArea from '@/Components/TextArea.vue'
 
 const props = defineProps({
     user: Object,
+    board: Object,
 });
 
-console.log(props)
+let form = '';
 
-const form = useForm({
-    _method: 'PUT',
-    name: props.user.name,
-    email: props.user.email,
-    photo: null,
-});
+if (props.board) {
+    
+    form = useForm({
+        _method: 'PUT',
+        active: props.board.active,
+        birthday: props.board.birthday,
+        age: props.board.age,
+        gender: props.board.gender,
+        interest: props.board.interest,
+        description: props.board.description,
+    });
 
-const verificationLinkSent = ref(null);
-const photoPreview = ref(null);
-const photoInput = ref(null);
+}  else {
 
-const updateProfileInformation = () => {
-    if (photoInput.value) {
-        form.photo = photoInput.value.files[0];
-    }
+    form = useForm({
+        _method: 'PUT',
+        active: null,
+        birthday: null,
+        age: null,
+        gender: null,
+        interest: null,
+        description: null,
+    });
 
-    form.post(route('user-profile-information.update'), {
-        errorBag: 'updateProfileInformation',
+}
+
+const updateProfileBoard = () => {
+    form.post(route('user-profile-board.update'), {
+        errorBag: 'updateProfileBoard',
         preserveScroll: true,
-        onSuccess: () => clearPhotoFileInput(),
     });
 };
 
-const sendEmailVerification = () => {
-    verificationLinkSent.value = true;
-};
-
-const selectNewPhoto = () => {
-    photoInput.value.click();
-};
-
-const updatePhotoPreview = () => {
-    const photo = photoInput.value.files[0];
-
-    if (! photo) return;
-
-    const reader = new FileReader();
-
-    reader.onload = (e) => {
-        photoPreview.value = e.target.result;
-    };
-
-    reader.readAsDataURL(photo);
-};
-
-const deletePhoto = () => {
-    router.delete(route('current-user-photo.destroy'), {
-        preserveScroll: true,
-        onSuccess: () => {
-            photoPreview.value = null;
-            clearPhotoFileInput();
-        },
-    });
-};
-
-const clearPhotoFileInput = () => {
-    if (photoInput.value?.value) {
-        photoInput.value.value = null;
-    }
-};
 </script>
 
 <template>
-    <FormSection @submitted="updateProfileInformation">
+
+    <FormSection @submitted="updateProfileBoard">
         <template #title>
             Profile Board
         </template>
@@ -89,21 +66,20 @@ const clearPhotoFileInput = () => {
 
         <template #form>
 
-            <!-- Name -->
+            <!-- Active -->
             <div class="col-span-6 sm:col-span-4">
-                <InputLabel for="name" value="Name" />
-                <TextInput
-                    id="name"
-                    v-model="form.name"
-                    type="text"
-                    class="mt-1 block w-full"
-                    required
-                    autocomplete="name"
+                <InputLabel for="active" value="Active" />
+                <Checkbox
+                    id="active"
+                    v-model="form.active"
+                    autocomplete="none"
+                    class="mr-2"
+                    :checked="form.active == 1 ? true : false"
                 />
-                <InputError :message="form.errors.name" class="mt-2" />
+                <label for="age">Show your age?</label>
             </div>
 
-            <!-- Email -->
+            <!-- Birthday -->
             <div class="col-span-6 sm:col-span-4">
                 <InputLabel for="birthday" value="Birthday" />
                 <TextInput
@@ -114,26 +90,59 @@ const clearPhotoFileInput = () => {
                     autocomplete="none"
                 />
                 <InputError :message="form.errors.birthday" class="mt-2" />
+            </div>
 
-                <div v-if="$page.props.jetstream.hasEmailVerification && user.email_verified_at === null">
-                    <p class="text-sm mt-2">
-                        Your email address is unverified.
+            <!-- Age -->
+            <div class="col-span-6 sm:col-span-4">
+                <InputLabel for="age" value="Age" />
+                <Checkbox
+                    id="age"
+                    v-model="form.age"
+                    autocomplete="none"
+                    class="mr-2"
+                    :checked="form.age == 1 ? true : false"
+                />
+                <label for="age">Show your age?</label>
+            </div>
 
-                        <Link
-                            :href="route('verification.send')"
-                            method="post"
-                            as="button"
-                            class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                            @click.prevent="sendEmailVerification"
-                        >
-                            Click here to re-send the verification email.
-                        </Link>
-                    </p>
+            <!-- Gender -->
+            <div class="col-span-6 sm:col-span-4">
+                <InputLabel for="gender" value="Gender" />
+                <select v-model="form.gender" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                    <option value="" selected></option>
+                    <option value="1">男</option>
+                    <option value="2">女</option>
+                    <option value="3">非二次元性別</option>
+                    <option value="4">不透露</option>
+                </select>
+                <InputError :message="form.errors.gender" class="mt-2" />
+            </div>
 
-                    <div v-show="verificationLinkSent" class="mt-2 font-medium text-sm text-green-600">
-                        A new verification link has been sent to your email address.
-                    </div>
-                </div>
+            <!-- Interest -->
+            <div class="col-span-6 sm:col-span-4">
+                <InputLabel for="interest" value="Interest" />
+                <TextInput
+                    id="interest"
+                    v-model="form.interest"
+                    type="text"
+                    class="mt-1 block w-full"
+                    autocomplete="none"
+                />
+                <InputError :message="form.errors.interest" class="mt-2" />
+            </div>
+
+            <!-- Description -->
+            <div class="col-span-6 sm:col-span-4">
+                <InputLabel for="description" value="Description" />
+                <TextArea
+                    id="description"
+                    v-model="form.description"
+                    type="text"
+                    class="mt-1 block w-full resize-none"
+                    autocomplete="none"
+                    :rows="4"
+                />
+                <InputError :message="form.errors.description" class="mt-2" />
             </div>
         </template>
 

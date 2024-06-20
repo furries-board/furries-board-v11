@@ -37,7 +37,7 @@ defineProps({
                 </div>
 
                 <div>
-                    <UpdateProfileBoard :user="$page.props.auth.user" class="mt-10 sm:mt-0" />
+                    <UpdateProfileBoard :user="$page.props.auth.user" :board="$page.props.user.board" class="mt-10 sm:mt-0" />
 
                     <SectionBorder />
                 </div>

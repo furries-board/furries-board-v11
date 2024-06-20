@@ -11,8 +11,9 @@ class Board extends Model
 {
     use HasFactory;
 
-    protected $fillabel = [
+    protected $fillable = [
         'user_id',
+        'active',
         'birthday',
         'age',
         'gender',
@@ -22,6 +23,6 @@ class Board extends Model
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 }

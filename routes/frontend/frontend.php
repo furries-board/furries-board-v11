@@ -4,7 +4,9 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    return Inertia::render("Front/Home");
+    return Inertia::render("Front/Home", [
+        "boards" => \App\Models\Board::with('user')->get()
+    ]);
 })->name('home');
 
 Route::get('/timeline', function () {
